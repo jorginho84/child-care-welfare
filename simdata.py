@@ -70,6 +70,7 @@ class SimData:
         #según lo que entendí, se debe devolver el óptimo para cada individuo
         labor_opt = np.array(0)
         cc_opt    = np.array(0)
+
         
         for x in choice_v1:
             x         = float(x)
@@ -78,11 +79,25 @@ class SimData:
         
         labor_opt = np.reshape(labor_opt[1:self.N+1], (self.N,1))
         cc_opt    = np.reshape(cc_opt[1:self.N+1], (self.N,1))
+        score     = self.model.score(cc_opt, shocks)
         
     
         max_u = self.model.utility(self.shocks, self.wage, labor_opt, cc_opt)
         
+<<<<<<< HEAD
+        return {'Choice': choice,
+                'Wage': wage,
+                'Test Score': score,
+                'Hours Choice': labor_opt,
+                'CC Choice': cc_opt,
+                'Max Utility': max_u}
+    
+    
+    
+    
+=======
         opt_set = np.hstack((choice_v1, labor_opt, cc_opt, max_u))                
       
         return opt_set
         #return {'Opt Labor': l_opt, 'Opt CC': d_opt, 'Max Utility': max_u}
+>>>>>>> parent of 56b0066... Semana 15-Dic
