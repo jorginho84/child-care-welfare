@@ -28,7 +28,7 @@ class Utility(object):
         Set up model's data and parameters
 
         """
-        self.N, self.param, self.data = N, param, data
+        self.param, self.N, self.data = param, N, data
 
 
     def waget(self):
@@ -42,20 +42,10 @@ class Utility(object):
         Returns wage as a column vector
         """
 
-<<<<<<< HEAD
         epsilon = np.sqrt(self.param.sigma2w)*np.random.randn(self.N)
                 
         xw = np.concatenate((np.reshape(np.array(self.data['constant'], dtype=np.float64),(self.N,1)),
                              np.reshape(np.array(self.data['m_sch'], dtype=np.float64), (self.N,1)),), axis=1)
-=======
-        epsilon = np.sqrt(self.param.sigmaw)*np.random.randn(self.N)
->>>>>>> parent of 56b0066... Semana 15-Dic
-        
-        #constant is always the last column:
-        colbeta0 = len(self.data[0])-1
-
-        xw = np.concatenate((np.reshape(self.data[:,0], (self.N,1)), #escolaridad
-                            np.reshape(self.data[:,colbeta0], (self.N,1)),),axis=1) #constante
         
         betas = self.param.betasw
         
@@ -78,7 +68,6 @@ class Utility(object):
         return omega, theta
 
 
-<<<<<<< HEAD
     def score(self, cc_choice, shocks):
         """
         Computes cognitive test score 
@@ -117,9 +106,7 @@ class Utility(object):
 
     
     def utility(self, wage, shocks, H, D):
-=======
-    def utility(self, shocks, wage, H, D):
->>>>>>> parent of 56b0066... Semana 15-Dic
+
         """
         
         L_i     : "leisure" understood as time not working, sleeping, commuting or spent in cc
@@ -147,7 +134,7 @@ class Utility(object):
         nli = self.nli(d_work)
         income = wage*H + nli
         
-        C = D*np.reshape(self.data[:,1], (self.N, 1)) #commute*dummy cc
+        C = D*np.reshape(np.array(self.data['commute2cc'],dtype=np.float64), (self.N, 1)) #commute*dummy cc
         
         alpha  = self.param.alpha
         gamma  = self.param.gamma
@@ -156,13 +143,9 @@ class Utility(object):
         
         L = self.param.T - (1-D)*self.param.Lc - H - 2*C
         
-<<<<<<< HEAD
+
         return np.log(income) + L*alpha + D*nu
-=======
-        return np.log(wage*H + sys.float_info.epsilon) + L*alpha + D*nu
 
-
->>>>>>> parent of 56b0066... Semana 15-Dic
 
 
 

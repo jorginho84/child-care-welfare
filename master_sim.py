@@ -8,19 +8,23 @@ import datetime
 from scipy import stats
 from scipy import interpolate
 import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import xlsxwriter
 
 sys.path.append("")
 
 #call py scripts
-import utility_akac as util
-import parameters_akac as parameters
-import simdata_akac as simdata
+import utility    as util
+import parameters as parameters
+import simdata    as simdata
+import estimate  as est
+import bootstrap  as bstr
 
 np.random.seed(123)
 
 begin_time = datetime.datetime.now()
 #------------ PREP DATA ------------#
-<<<<<<< HEAD
+
 data = pd.read_stata('/Users/antoniaaguilera/Documents/GitHub/child-care-welfare/data/data_python.dta')
 N = len(data)
 data['constant']=np.ones((N,1))
@@ -44,12 +48,7 @@ regn = sm.OLS(endog = data['ln_nli'], exog = data[['constant', 'married34', 'd_w
 
 betasn  = regn.params
 sigma2n = np.var(regn.resid)
-=======
-data1 = pd.read_stata('data_python.dta')
-N = len(data1)
-data1['constant']=np.ones((N,1))
-data=data1.to_numpy()
->>>>>>> parent of 56b0066... Semana 15-Dic
+
 
 #------------ PARAMETERS ------------#
 #betas  = [beta1 , beta0]
@@ -62,19 +61,12 @@ Lc         = 8*20       #monthly cc hours
 alpha      = 0.1
 gamma      = 0.1
 
-#------------ VARIABLES ------------#
-H1 = np.reshape(data[:,3], (N,1))
-D1 = np.reshape(data[:,2], (N,1))
-
-<<<<<<< HEAD
-H1 = np.array(data[['monthly_hrs']], dtype=np.float64)
-D1 = np.array(data[['d_cc_34']], dtype=np.float64)
-
 #------------ CALL CLASSES ------------#
 param0 = parameters.Parameters(betasw, betast, betasn, sigma2w, sigma2t, sigma2n, 
                                meanshocks, covshocks, T, Lc, alpha, gamma)
+
     
-model     = util.Utility(N, data, param0)
+model     = util.Utility(param0, N, data)
 model_sim = simdata.SimData(N, model)
 model_est = est.estimate(N, data, param0, model, model_sim)
 
@@ -83,22 +75,12 @@ model_est = est.estimate(N, data, param0, model, model_sim)
 times = 20
 results_estimate = model_est.simulation(times)
 results_bootstrap = bstr.bootstrap(data, times)
-=======
-#------------ CALL FUNCTIONS ------------#
-param0 = parameters.Parameters(betas,sigmaw, meanshocks, covshocks, T, Lc, alpha, gamma)
-
-model = util.Utility(param0, N, data)
-
-#de acá hacia abajo debería estar dentro de la función? 
-wage   = model.waget()
-shocks = model.res_causal()
->>>>>>> parent of 56b0066... Semana 15-Dic
-
-U      = model.utility(shocks,wage, H1, D1)
 
 #------------ DATA SIMULATION ------------#
 
-<<<<<<< HEAD
+workbook = xlsxwriter.Workbook('/Users/antoniaaguilera/Documents/GitHub/child-care-welfare/data/labor_choice.xlsx')
+worksheet = workbook.add_worksheet()
+
 worksheet.write('B2', 'parameter')
 worksheet.write('B3', 'labor choice')
 worksheet.write('B4', 'cc choice')
@@ -155,12 +137,7 @@ worksheet.write('E12', results_bootstrap['SE Var Score'])
         
 workbook.close()
 #------------ END TIME ------------#
-=======
-sim = simdata.SimData(N, model, shocks, wage)
-opt_set = sim.choice()
 
-
->>>>>>> parent of 56b0066... Semana 15-Dic
 end_time = datetime.datetime.now()
 
 print(end_time-begin_time)

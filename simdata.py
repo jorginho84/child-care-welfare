@@ -18,18 +18,16 @@ class SimData:
 
     """
     
-    def __init__(self,N,model, shocks, wage):
+    def __init__(self,N,model):
         """
         model: a utility instance (with arbitrary parameters)
         """
         self.N      = N
         self.model  = model
-        self.shocks = shocks
-        self.wage   = wage
         
         #self.H, self.D = H, D
         
-    def util(self, choice):
+    def util(self, choice, shocks, wage):
         """
         This function takes labor and cc choices and computes utils
         """
@@ -37,7 +35,7 @@ class SimData:
         H = choice[0]
         D = choice[1]
 
-        return self.model.utility(self.shocks, self.wage, H, D)
+        return self.model.utility(wage, shocks, H, D)
 
     
     def choice(self):
@@ -53,17 +51,19 @@ class SimData:
         choice_2 = [ones*160 , zeros]
         choice_3 = [ones*160 , ones]
         
+        wage   = self.model.waget()
+        shocks = self.model.res_causal()
         
-        u_0 = self.util(choice_0)
-        u_1 = self.util(choice_1)
-        u_2 = self.util(choice_2)
-        u_3 = self.util(choice_3)
+        u_0 = self.util(choice_0, shocks, wage)
+        u_1 = self.util(choice_1, shocks, wage)
+        u_2 = self.util(choice_2, shocks, wage)
+        u_3 = self.util(choice_3, shocks, wage)
         
         
-        u_v2 = np.array([u_0, u_1, u_2, u_3]).T
+        u = np.hstack([u_0, u_1, u_2, u_3])
         
-        choice_v1 = np.argmax(u_v2, axis=2)
-        choice_v1 = np.reshape(choice_v1[0], (self.N,1))
+        choice = np.argmax(u, axis=1)
+        choice = np.reshape(choice, (self.N,1))
         #returns a (1,N) array
         
         dict= { 0: [0,0], 1: [0,1], 2: [160,0], 3: [160,1]}
@@ -72,7 +72,7 @@ class SimData:
         cc_opt    = np.array(0)
 
         
-        for x in choice_v1:
+        for x in choice:
             x         = float(x)
             labor_opt = np.append(labor_opt , dict[x][0])
             cc_opt    = np.append(cc_opt    , dict[x][1])
@@ -82,22 +82,11 @@ class SimData:
         score     = self.model.score(cc_opt, shocks)
         
     
-        max_u = self.model.utility(self.shocks, self.wage, labor_opt, cc_opt)
+        max_u = self.model.utility(shocks, wage, labor_opt, cc_opt)
         
-<<<<<<< HEAD
         return {'Choice': choice,
                 'Wage': wage,
                 'Test Score': score,
                 'Hours Choice': labor_opt,
                 'CC Choice': cc_opt,
                 'Max Utility': max_u}
-    
-    
-    
-    
-=======
-        opt_set = np.hstack((choice_v1, labor_opt, cc_opt, max_u))                
-      
-        return opt_set
-        #return {'Opt Labor': l_opt, 'Opt CC': d_opt, 'Max Utility': max_u}
->>>>>>> parent of 56b0066... Semana 15-Dic
