@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import xlsxwriter
 
-sys.path.append("")
+sys.path.append("/Users/jorge-home/Dropbox/Research/DN-early/structural/child-care-welfare")
 
 #call py scripts
 import utility    as util
@@ -25,7 +25,7 @@ np.random.seed(123)
 begin_time = datetime.datetime.now()
 #------------ PREP DATA ------------#
 
-data = pd.read_stata('/Users/antoniaaguilera/Documents/GitHub/child-care-welfare/data/data_python.dta')
+data = pd.read_stata('data/data_python.dta')
 N = len(data)
 data['constant']=np.ones((N,1))
 
@@ -55,10 +55,10 @@ sigma2n = np.var(regn.resid)
 betas      = [0.0992312, 0.0084627] 
 sigmaw     = 0.5869
 meanshocks = [0,0]
-covshocks  = [[0.5,0],[0,0.5]] 
+covshocks  = [[1,(1**(1/2))*(0.9**(1/2))*0.4],[(1**(1/2))*(0.9**(1/2))*0.4,0.9]] 
 T          = (24-8)*20  #monthly waking hours
 Lc         = 8*20       #monthly cc hours
-alpha      = 0.1
+alpha      = -0.1
 gamma      = 0.1
 
 #------------ CALL CLASSES ------------#
@@ -78,7 +78,7 @@ results_bootstrap = bstr.bootstrap(data, times)
 
 #------------ DATA SIMULATION ------------#
 
-workbook = xlsxwriter.Workbook('/Users/antoniaaguilera/Documents/GitHub/child-care-welfare/data/labor_choice.xlsx')
+workbook = xlsxwriter.Workbook('data/labor_choice.xlsx')
 worksheet = workbook.add_worksheet()
 
 worksheet.write('B2', 'parameter')

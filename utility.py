@@ -141,10 +141,10 @@ class Utility(object):
         
         nu =  -shocks[0] + gamma*shocks[1]
         
-        L = self.param.T - (1-D)*self.param.Lc - H - 2*C
+        #L = self.param.T - (1-D)*self.param.Lc - H - 2*C
         
 
-        return np.log(income) + L*alpha + D*nu
+        return np.log(income) + d_work*alpha + D*nu
 
 
 
