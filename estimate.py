@@ -92,7 +92,8 @@ class estimate:
                 varres_est[i] = np.var(reg_w.resid)
             
             "Y_i = alpha_0 + alpha_1*D_i + u_i"
-            reg_1         = sm.OLS(endog = score, exog=self.data[['constant', 'd_cc_34']], missing='drop').fit()
+            d = {'constant': np.ones(ln_w.size),'CC':sim['CC Choice'][:,0]}
+            reg_1         = sm.OLS(endog = score, exog=pd.DataFrame(data=d), missing='drop').fit()
             alpha1_est[i] = reg_1.params[1]
             
             "D_i = gamma_0 + gamma_1*Z_i + v_i"

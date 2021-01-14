@@ -54,12 +54,16 @@ sigma2n = np.var(regn.resid)
 #betas  = [beta1 , beta0]
 betas      = [0.0992312, 0.0084627] 
 sigmaw     = 0.5869
-meanshocks = [0,0]
-covshocks  = [[1,(1**(1/2))*(0.9**(1/2))*0.4],[(1**(1/2))*(0.9**(1/2))*0.4,0.9]] 
+meanshocks = [0,0.5]
+rho        = 0.9
+sigma1     = 1
+sigma2     = 0.9
+cov12      = (sigma1**(1/2))*(sigma2**(1/2))*rho
+covshocks  = [[sigma1,cov12],[cov12,sigma2]] 
 T          = (24-8)*20  #monthly waking hours
 Lc         = 8*20       #monthly cc hours
 alpha      = -0.1
-gamma      = 0.1
+gamma      = 0.4
 
 #------------ CALL CLASSES ------------#
 param0 = parameters.Parameters(betasw, betast, betasn, sigma2w, sigma2t, sigma2n, 
