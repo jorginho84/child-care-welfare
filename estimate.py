@@ -8,31 +8,26 @@ Created on Wed Dec  2 13:47:22 2020
 
 import numpy as np
 import pandas as pd
-import pickle
-import tracemalloc
-import itertools
-import sys, os
 import statsmodels.api as sm
-from scipy import stats
-from scipy import interpolate
-import matplotlib.pyplot as plt
-import seaborn as sn
-from statsmodels.iolib.summary2 import summary_col
+from scipy.optimize import minimize
 
-
+import utility    as util
+#import parameters as parameters
+import simdata    as simdata
 
 
 class estimate:
     "This class "
     
-    def __init__(self, N, data, param, model, model_sim):
+    def __init__(self, N, data, param, moments_boot, w_matrix):
         "Initial class"
         
         self.N, self.data, self.param = N, data, param
-        self.model, self.model_sim    = model, model_sim
+        self.moments_boot, self.w_matrix = moments_boot, w_matrix
+
         
     
-    def simulation(self,times):
+    def simulation(self, model_sim):
         """
         Function that simulates x times.
         
@@ -58,9 +53,10 @@ class estimate:
             – Correr regresiones con data real. Calcular SEs de cada uno de estos momentos usando bootstrap
             – Agregar momentos (simulados, data y SE) en la tabla.
         """
-        alpha1_est = np.zeros(times)
-        beta1_est  = np.zeros(times)
-        gamma1_est = np.zeros(times)
+        times = self.param.times
+        b1_td_est  = np.zeros(times)
+        b1_tz_est  = np.zeros(times)
+        b1_dz_est  = np.zeros(times)
         
         b0_est     = np.zeros(times)
         b1_est     = np.zeros(times)
@@ -75,8 +71,8 @@ class estimate:
         
         
         for i in range(0,times):
-            
-            sim = self.model_sim.choice()
+            #set seed
+            sim = model_sim.choice()
             
             ln_w = np.log(sim['Wage'])
             y = pd.DataFrame(ln_w)
@@ -94,15 +90,15 @@ class estimate:
             "Y_i = alpha_0 + alpha_1*D_i + u_i"
             d = {'constant': np.ones(ln_w.size),'CC':sim['CC Choice'][:,0]}
             reg_1         = sm.OLS(endog = score, exog=pd.DataFrame(data=d), missing='drop').fit()
-            alpha1_est[i] = reg_1.params[1]
+            b1_td_est[i]  = reg_1.params[1]
             
             "D_i = gamma_0 + gamma_1*Z_i + v_i"
             reg_2         = sm.OLS(endog=self.data['d_cc_34'], exog=self.data[['constant', 'commute2cc']], missing='drop').fit()
-            gamma1_est[i] = reg_2.params[1]
+            b1_dz_est[i]  = reg_2.params[1]
             
             "Y_i=beta_0+beta_1*Z_i + w_i"
             reg_3         = sm.OLS(endog = score, exog=self.data[['constant', 'commute2cc']], missing='drop').fit()
-            beta1_est[i]  = reg_3.params[1] 
+            b1_tz_est[i]  = reg_3.params[1] 
             
             mean_labor[i] = np.nanmean(sim['Hours Choice']/160) 
             mean_cc[i]    = np.nanmean(sim['CC Choice'])
@@ -110,9 +106,9 @@ class estimate:
             var_score[i]  = np.var(sim['Test Score'])
             
         
-        alpha1_sim = np.mean(alpha1_est)
-        beta1_sim  = np.mean(beta1_est)
-        gamma1_sim = np.mean(gamma1_est)
+        b1_td_sim = np.mean(b1_td_est)
+        b1_tz_sim = np.mean(b1_tz_est)
+        b1_dz_sim = np.mean(b1_dz_est)#cambiar nombre 
         
         b0_sim     = np.mean(b0_est) 
         b1_sim     = np.mean(b1_est) 
@@ -127,21 +123,104 @@ class estimate:
         return { 'Labor Choice': labor_sim,
                 'CC Choice': cc_sim,
                 'Test Score': score_sim,
-                'Beta0': b0_sim,
-                'Beta1': b1_sim,
-                'Resid var': varres_sim,
-                'alpha_1': alpha1_sim,
-                'beta_1': beta1_sim,
-                'gamma_1': gamma1_sim,
-                'Var Score': var_score_sim}
+                'beta0_w': b0_sim,
+                'beta1_w': b1_sim,
+                'resid_var_w': varres_sim,
+                'beta1_td': b1_td_sim,
+                'beta1_tz': b1_tz_sim,
+                'beta1_dz': b1_dz_sim,
+                'resid_var_td': var_score_sim}
     
+    
+    def ll(self, beta):
+        """
+		Takes structural parameters and computes the objective function for optimization 
         
+        beta = [beta]
+		
+		"""
+		#updating beta->parameters instance to compute likelihood.
+     
+        self.param.alpha           = beta[0] #from utility function
+        self.param.gamma           = beta[1] #from resistance to treatment 
+        #self.param.meanshocks[0]   = beta[]
+        self.param.meanshocks[1]   = beta[2] #mean of theta (causal effect of cc on child skills )
+        self.param.covshocks[0][0] = beta[3] #sigma1
+        self.param.covshocks[0][1] = beta[4] #cov12
+        self.param.covshocks[1][0] = beta[4] #cov12
+        self.param.covshocks[1][1] = beta[5] #sigma2
+        self.param.betas[0]        = beta[6] #structural parameter of wage equation
+        self.param.betas[1]        = beta[7] #structural parameter of wage equation
+        self.param.sigma2w_estr    = beta[8] #variance of res of wage equation
+        self.param.betastd[0]      = beta[9] #constant from test score equation
+        
+    
+
+        model  = util.Utility(self.param, self.N, self.data)
+        
+        model_sim = simdata.SimData(self.N, model)
+        
+        est = self.simulation(model_sim)
+                
+        labor_choice = est['Labor Choice']
+        cc_choice    = est['CC Choice']
+        test_score   = est['Test Score']
+        beta0_w      = est['beta0_w']
+        beta1_w      = est['beta1_w']
+        resid_var_w  = est['resid_var_w']
+        beta1_td     = est['beta1_td']
+        beta1_tz     = est['beta1_tz']
+        beta1_dz     = est['beta1_dz']
+        resid_var_td = est['resid_var_td']
+            
+        
+        #number of moments to match
+        num_par = labor_choice.size + cc_choice.size + test_score.size + beta0_w.size + beta1_w.size +resid_var_w.size + beta1_td.size + beta1_tz.size + beta1_dz.size + resid_var_td.size
+        
+        
+        #outer matrix
+        x_vector=np.zeros((num_par,1))
+        
+        #10 momentos 
+        x_vector[0,0] = labor_choice - self.moments_boot['Labor Choice']
+        x_vector[1,0] = cc_choice    - self.moments_boot['CC Choice']
+        x_vector[2,0] = test_score   - self.moments_boot['Test Score']
+        x_vector[3,0] = beta0_w      - self.moments_boot['beta0_w'] #beta0 from wage
+        x_vector[4,0] = beta1_w      - self.moments_boot['beta1_w'] #beta1 from wage
+        x_vector[5,0] = resid_var_w  - self.moments_boot['resid_var_w'] #resid var from wage
+        x_vector[6,0] = beta1_td     - self.moments_boot['beta1_td'] #beta1 from test vs d_cc (td)
+        x_vector[7,0] = beta1_dz     - self.moments_boot['beta1_dz'] #beta1 from d_cc vs commute (dz)
+        x_vector[8,0] = beta1_tz     - self.moments_boot['beta1_tz'] #beta1 from test vs commute (tz)
+        x_vector[9,0] = resid_var_td - self.moments_boot['resid_var_td'] #resid var from t vs d
+        
+        
+        #The Q metric
+        q_w = np.dot(np.dot(np.transpose(x_vector),self.w_matrix),x_vector)
+        print ('')
+        print ('The objetive function value equals ', q_w)
+        print ('')
+
+        return q_w
 
 
-
-
-
-
-
-
+		
+    def optimizer(self):
+        
+        beta0 = np.array([self.param.alpha,
+                          self.param.gamma,
+                          self.param.meanshocks[1],
+                          self.param.covshocks[0][0],
+                          self.param.covshocks[0][1],
+                          self.param.covshocks[1][0],  
+                          self.param.covshocks[1][1],
+                          self.param.betas[0],
+                          self.param.betas[1],
+                          self.param.sigma2w_estr,
+                          self.param.betastd[0] ]) 
+        
+        opt = minimize(self.ll, beta0,  method='Nelder-Mead', options={'maxiter':5000, 'maxfev': 90000, 'ftol': 1e-3, 'disp': True});
+		#opt = minimize(self.ll, beta0,  method='Nelder-Mead', options={'maxiter':5000, 'gtol': 1e-3, 'disp': True});
+		#opt = pybobyqa.solve(self.ll, beta0)
+        return opt
+        
 
