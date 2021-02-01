@@ -9,16 +9,17 @@ class Parameters:
 	List of structural parameters and prices
 
 	"""
-    def __init__(self, betasw, betast, betasn, sigma2w, sigma2t, sigma2n, meanshocks, covshocks, T, Lc, alpha, gamma):
+    def __init__(self, betas, betasw, betastd, betasn, sigma2w_estr, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times):
          
-        self.betasw, self.betast, self.betasn = betasw, betast, betasn
+        self.betas, self.betasw, self.betastd, self.betasn = betas, betasw, betastd, betasn
         
-        self.sigma2w, self.sigma2t, self.sigma2n = sigma2w, sigma2t, sigma2n
+        self.sigma2w_estr, self.sigma2w_reg, =  sigma2w_estr, sigma2w_reg
         
-        self.T, self.Lc                 = T, Lc
+        self.T, self.Lc  = T, Lc
         
         self.meanshocks, self.covshocks = meanshocks, covshocks
         
         self.alpha, self.gamma          = alpha, gamma
         
- 
+        self. times = times
+        

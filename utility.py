@@ -42,7 +42,7 @@ class Utility(object):
         Returns wage as a column vector
         """
 
-        epsilon = np.sqrt(self.param.sigma2w)*np.random.randn(self.N)
+        epsilon = np.sqrt(self.param.sigma2w_reg)*np.random.randn(self.N)
                 
         xw = np.concatenate((np.reshape(np.array(self.data['constant'], dtype=np.float64),(self.N,1)),
                              np.reshape(np.array(self.data['m_sch'], dtype=np.float64), (self.N,1)),), axis=1)
@@ -77,7 +77,7 @@ class Utility(object):
         u = np.reshape(np.random.randn(self.N), (self.N,1))
         ones = np.reshape(np.ones(self.N), (self.N,1))
 
-        return  self.param.betast[0]*ones + np.multiply(shocks[1], cc_choice) + u
+        return  self.param.betastd[0]*ones + np.multiply(shocks[1], cc_choice) + u
      
     
     
@@ -134,7 +134,7 @@ class Utility(object):
         nli = self.nli(d_work)
         income = wage*H + nli
         
-        C = D*np.reshape(np.array(self.data['commute2cc'],dtype=np.float64), (self.N, 1)) #commute*dummy cc
+        #C = D*np.reshape(np.array(self.data['commute2cc'],dtype=np.float64), (self.N, 1)) #commute*dummy cc
         
         alpha  = self.param.alpha
         gamma  = self.param.gamma
