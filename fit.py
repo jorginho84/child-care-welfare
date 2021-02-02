@@ -70,7 +70,7 @@ meanshocks = [0,0.5]
 rho        = 0.9
 sigma1     = 1#constante
 sigma2     = 0.9
-covshocks  = [sigma1,sigma2,rho] 
+covshocks  = [sigma1,sigma2,rho]
 T          = (24-8)*20  #monthly waking hours
 Lc         = 8*20       #monthly cc hours
 alpha      = -0.1
@@ -90,44 +90,70 @@ moments_boot = model_boot.boostr(times)
 model_est = est.estimate(N, data, param0, moments_boot, w_matrix)
 
 
+results_estimate = model_est.simulation(model_sim)
 
 
-#----------------- OPTIMIZER -----------------#
+#------------ DATA SIMULATION ------------#
 
-start_time = time.time()
+workbook = xlsxwriter.Workbook('data/labor_choice.xlsx')
+worksheet = workbook.add_worksheet()
 
-opt = model_est.optimizer()
+worksheet.write('B2', 'parameter')
+worksheet.write('B3', 'labor choice')
+worksheet.write('B4', 'cc choice')
+worksheet.write('B5', 'test score')
+worksheet.write('B6', 'wage ec: beta_0')
+worksheet.write('B7', 'wage ec: beta_1')
+worksheet.write('B8', 'sigma^2_{varepsilon}')
+worksheet.write('B9', 'beta1_td')
+worksheet.write('B10', 'beta1_tz')
+worksheet.write('B11', 'beta1_dz')
+worksheet.write('B12', 'resid var score')
 
-#------------ END TIME ------------#
 
-
-time_opt=time.time() - start_time
-print ('Done in')
-print("--- %s seconds ---" % (time_opt))
-
+worksheet.write('C2', 'sim')
+worksheet.write('C3', results_estimate['Labor Choice'])
+worksheet.write('C4', results_estimate['CC Choice'])
+worksheet.write('C5', results_estimate['Test Score'])
+worksheet.write('C6', results_estimate['beta0_w'])
+worksheet.write('C7', results_estimate['beta1_w'])
+worksheet.write('C8', results_estimate['resid_var_w'])
+worksheet.write('C9', results_estimate['beta1_td'])
+worksheet.write('C10', results_estimate['beta1_tz'])
+worksheet.write('C11', results_estimate['beta1_dz'])
+worksheet.write('C12', results_estimate['resid_var_td'])
         
-
-#the list of estimated parameters
-alpha_opt = opt.x[0]
-gamma_opt = opt.x[1]
-meanshocks0_opt = opt.x[2]
-meanshocks1_opt = opt.x[3]
-sigma2_shock_opt = opt.x[4]
-rho_shock_opt = opt.x[5]
-betas0_opt = opt.x[6]
-betas1_opt = opt.x[7]
-sigma2w_opt = opt.x[8]
-betastd_opt = opt.x[9]
-
-
+        
+worksheet.write('D2', 'data')
+worksheet.write('D3', moments_boot['Labor Choice'])
+worksheet.write('D4', moments_boot['CC Choice'])
+worksheet.write('D5', moments_boot['Test Score'])
+worksheet.write('D6', moments_boot['beta0_w'])
+worksheet.write('D7', moments_boot['beta1_w'])
+worksheet.write('D8', moments_boot['resid_var_w'])
+worksheet.write('D9', moments_boot['beta1_td'])
+worksheet.write('D10', moments_boot['beta1_tz'])
+worksheet.write('D11', moments_boot['beta1_dz'])
+worksheet.write('D12', moments_boot['resid_var_td'])
 
 
-betas_opt = np.array([alpha_opt,gamma_opt,meanshocks0_opt,meanshocks1_opt,
-                      sigma2_shock_opt,rho_shock_opt,betas0_opt,
-                      betas1_opt,sigma2w_opt,betastd_opt])
+worksheet.write('E2', 'SE')
+worksheet.write('E3', moments_boot['SE Labor Choice'])
+worksheet.write('E4', moments_boot['SE CC Choice'])
+worksheet.write('E5', moments_boot['SE Test Score'])
+worksheet.write('E6', moments_boot['SE Beta0'])
+worksheet.write('E7', moments_boot['SE Beta1'])
+worksheet.write('E8', moments_boot['SE sigma^2_e'])
+worksheet.write('E9', moments_boot['SE beta1_td'])
+worksheet.write('E10', moments_boot['SE beta1_tz'])
+worksheet.write('E11', moments_boot['SE beta1_dz'])
+worksheet.write('E12', moments_boot['SE Var Score'])
 
 
-np.save('/Users/jorge-home/Dropbox/Research/DN-early/Dynamic_childcare/Results/betas_modelv1.npy',betas_opt)
+workbook.close()
+
+
+
 
 
 

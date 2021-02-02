@@ -143,12 +143,10 @@ class estimate:
      
         self.param.alpha           = beta[0] #disutility from work
         self.param.gamma           = beta[1] #resistance to treatment
-        #self.param.meanshocks[0]   = beta[]
-        self.param.meanshocks[1]   = beta[2] #mean of theta (causal effect of cc on child skills )
-        self.param.covshocks[0][0] = beta[3] #sigma1
-        self.param.covshocks[0][1] = beta[4] #cov12
-        self.param.covshocks[1][0] = beta[4] #cov12
-        self.param.covshocks[1][1] = beta[5] #sigma2
+        self.param.meanshocks[0]   = beta[2] #mean of resistance to treatment
+        self.param.meanshocks[1]   = beta[3] #mean of theta (causal effect of cc on child skills )
+        self.param.covshocks[1]    = beta[4] #var of causal effect
+        self.param.covshocks[2]    = beta[5] #correlation
         self.param.betas[0]        = beta[6] #structural parameter of wage equation
         self.param.betas[1]        = beta[7] #structural parameter of wage equation
         self.param.sigma2w_estr    = beta[8] #variance of res of wage equation
@@ -208,17 +206,17 @@ class estimate:
         
         beta0 = np.array([self.param.alpha,
                           self.param.gamma,
+                          self.param.meanshocks[0],
                           self.param.meanshocks[1],
-                          self.param.covshocks[0][0],
-                          self.param.covshocks[0][1],
-                          self.param.covshocks[1][1],
+                          self.param.covshocks[1],#variance of causal effect
+                          self.param.covshocks[2],#correlation
                           self.param.betas[0],
                           self.param.betas[1],
                           self.param.sigma2w_estr,
                           self.param.betastd[0] ])
         
-        opt = minimize(self.ll, beta0,  method='BFGS', options={'maxiter':5000, 'gtol': 1e-3, 'disp': True}) 
-
+        opt = minimize(self.ll, beta0,  method='Nelder-Mead', options={'maxiter':5000, 'maxfev': 90000, 'ftol': 1e-3, 'disp': True})
+        
         return opt
         
 

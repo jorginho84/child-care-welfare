@@ -60,8 +60,13 @@ class Utility(object):
         
         Returns array with objects omega [0] and theta [1]
         """
+        sigma1 = self.param.covshocks[0]
+        sigma2 = self.param.covshocks[1]
+        rho = self.param.covshocks[2]
+        cov12      = (sigma1**(1/2))*(sigma2**(1/2))*rho
+        covshocks  = [[sigma1,cov12],[cov12,sigma2]]
         
-        s = np.random.multivariate_normal(self.param.meanshocks, self.param.covshocks, self.N)
+        s = np.random.multivariate_normal(self.param.meanshocks, covshocks, self.N)
         omega = np.reshape(s[:,0],(self.N,1))
         theta = np.reshape(s[:,1],(self.N,1))
       
