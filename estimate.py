@@ -141,8 +141,8 @@ class estimate:
 		"""
 		#updating beta->parameters instance to compute likelihood.
      
-        self.param.alpha           = beta[0] #from utility function
-        self.param.gamma           = beta[1] #from resistance to treatment 
+        self.param.alpha           = beta[0] #disutility from work
+        self.param.gamma           = beta[1] #resistance to treatment
         #self.param.meanshocks[0]   = beta[]
         self.param.meanshocks[1]   = beta[2] #mean of theta (causal effect of cc on child skills )
         self.param.covshocks[0][0] = beta[3] #sigma1
@@ -211,16 +211,14 @@ class estimate:
                           self.param.meanshocks[1],
                           self.param.covshocks[0][0],
                           self.param.covshocks[0][1],
-                          self.param.covshocks[1][0],  
                           self.param.covshocks[1][1],
                           self.param.betas[0],
                           self.param.betas[1],
                           self.param.sigma2w_estr,
-                          self.param.betastd[0] ]) 
+                          self.param.betastd[0] ])
         
-        opt = minimize(self.ll, beta0,  method='Nelder-Mead', options={'maxiter':5000, 'maxfev': 90000, 'ftol': 1e-3, 'disp': True});
-		#opt = minimize(self.ll, beta0,  method='Nelder-Mead', options={'maxiter':5000, 'gtol': 1e-3, 'disp': True});
-		#opt = pybobyqa.solve(self.ll, beta0)
+        opt = minimize(self.ll, beta0,  method='BFGS', options={'maxiter':5000, 'gtol': 1e-3, 'disp': True}) 
+
         return opt
         
 
