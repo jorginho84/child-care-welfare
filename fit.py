@@ -81,7 +81,7 @@ times = 20
 
 
 #------------ CALL CLASSES, ESTIMATION SIM & BOOTSTRAP ------------#
-param0 = parameters.Parameters(betas, betasw, betastd, betasn, sigma2w_estr, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times)
+param0 = parameters.Parameters(betas, betasw, betastd, betasn, sigma2n, sigma2w_estr, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times)
 model     = util.Utility(param0, N, data)
 model_sim = simdata.SimData(N, model)
 model_boot= bstr.bootstrap(N, data)

@@ -98,7 +98,7 @@ class Utility(object):
         ln_nli = beta_0+beta_1*d_married+beta_2*d_work+beta_3*n_kids+beta_4*sch+w
         """
         
-        epsilon = np.random.randn(self.N)
+        epsilon = ((self.param.sigma2n)**2)*np.random.randn(self.N)
         xn = np.concatenate((np.reshape(np.array(self.data['constant'], dtype=np.float64),(self.N,1)),
                              np.reshape(np.array(self.data['married34'], dtype=np.float64), (self.N,1)),
                              np.reshape(np.array(labor_choice, dtype=np.float64), (self.N,1)),
@@ -139,16 +139,14 @@ class Utility(object):
         nli = self.nli(d_work)
         income = wage*H + nli
         
-        #C = D*np.reshape(np.array(self.data['commute2cc'],dtype=np.float64), (self.N, 1)) #commute*dummy cc
         
         alpha  = self.param.alpha
         gamma  = self.param.gamma
         
         nu =  -shocks[0] + gamma*shocks[1]
         
-        #L = self.param.T - (1-D)*self.param.Lc - H - 2*C
+        income[income <= 0] = 1
         
-
         return np.log(income) + d_work*alpha + D*nu
 
 
