@@ -35,13 +35,14 @@ data['constant'] = np.ones((N,1))
 #wage
 regw=sm.OLS(endog=data['ln_w'], exog=data[['constant', 'm_sch']], missing='drop').fit()
 
-betasw = regw.params
+betasw = [-0.39,0.15]
 sigma2w_reg = np.var(regw.resid)
 
 #test score vs d_cc
 regtd=sm.OLS(endog=data['TVIP_age_3'], exog=data[['constant', 'd_cc_34']], missing='drop').fit()
 
 betastd = regtd.params
+betastd = [-0.05]
 sigma2td= np.var(regtd.resid)
 
 #d_cc vs commute
@@ -66,17 +67,18 @@ sigma2n = np.var(regn.resid)
 #betas  = [beta1 , beta0]
 betas      = [0.0992312, 0.0084627] 
 sigma2w_estr = 0.5869
-meanshocks = [0,0.5]
-rho        = 0.9
+meanshocks = [-0.1,0.5]
+rho        = 0.75
 sigma1     = 1#constante
 sigma2     = 0.9
 covshocks  = [sigma1,sigma2,rho]
 T          = (24-8)*20  #monthly waking hours
 Lc         = 8*20       #monthly cc hours
-alpha      = -0.1
+alpha      = -0.5
 gamma      = 0.4
 w_matrix   = np.identity(10)
-times = 20
+times = 100
+times_boot = 20
 
 
 
@@ -86,7 +88,7 @@ model     = util.Utility(param0, N, data)
 model_sim = simdata.SimData(N, model)
 model_boot= bstr.bootstrap(N, data)
 
-moments_boot = model_boot.boostr(times)
+moments_boot = model_boot.boostr(times_boot)
 model_est = est.estimate(N, data, param0, moments_boot, w_matrix)
 
 

@@ -74,11 +74,11 @@ class bootstrap:
         cc_boot    = np.mean(smpl_mean_cc)
         score_boot = np.mean(smpl_mean_score)
         var_score_boot = np.mean(smpl_var_score)
-        var_score_se = np.std(smpl_var_score)/np.sqrt(n)
+        var_score_se = np.std(smpl_var_score)
         
-        se_labor = np.std(smpl_mean_labor)/np.sqrt(n)
-        se_cc    = np.std(smpl_mean_cc)/np.sqrt(n)
-        se_score = np.std(smpl_mean_score)/np.sqrt(n)
+        se_labor = np.std(smpl_mean_labor)
+        se_cc    = np.std(smpl_mean_cc)
+        se_score = np.std(smpl_mean_score)
         
         b0_boot = np.mean(b0_est)
         b1_boot = np.mean(b1_est)
@@ -86,7 +86,7 @@ class bootstrap:
         se0_boot  = np.mean(se0_est)
         se1_boot  = np.mean(se1_est)
         varres    = np.mean(varres_est) 
-        varres_se = np.std(varres_est)/np.sqrt(n)
+        varres_se = np.std(varres_est)
 
         
         b1_td_boot = np.mean(b1_td_est)
