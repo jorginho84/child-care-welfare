@@ -36,13 +36,13 @@ data['constant'] = np.ones((N,1))
 regw=sm.OLS(endog=data['ln_w'], exog=data[['constant', 'm_sch']], missing='drop').fit()
 
 betasw = [-0.39,0.15]
-sigma2w_reg = np.var(regw.resid)
+sigma2w_reg = 0.34
 
 #test score vs d_cc
 regtd=sm.OLS(endog=data['TVIP_age_3'], exog=data[['constant', 'd_cc_34']], missing='drop').fit()
 
 betastd = regtd.params
-betastd = [-0.05]
+betastd = [-0.15]
 sigma2td= np.var(regtd.resid)
 
 #d_cc vs commute
@@ -68,9 +68,9 @@ sigma2n = np.var(regn.resid)
 betas      = [0.0992312, 0.0084627] 
 sigma2w_estr = 0.5869
 meanshocks = [-0.1,0.5]
-rho        = 0.75
+rho        = 0.9
 sigma1     = 1#constante
-sigma2     = 0.9
+sigma2     = 0.5
 covshocks  = [sigma1,sigma2,rho]
 T          = (24-8)*20  #monthly waking hours
 Lc         = 8*20       #monthly cc hours

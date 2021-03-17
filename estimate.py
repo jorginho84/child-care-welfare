@@ -71,7 +71,8 @@ class estimate:
         
         
         for i in range(0,times):
-            #set seed
+            np.random.seed(i)
+            
             sim = model_sim.choice()
             
             ln_w = np.log(sim['Wage'])
