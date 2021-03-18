@@ -35,14 +35,13 @@ data['constant'] = np.ones((N,1))
 #wage
 regw=sm.OLS(endog=data['ln_w'], exog=data[['constant', 'm_sch']], missing='drop').fit()
 
-betasw = [-0.39,0.15]
-sigma2w_reg = 0.34
+
 
 #test score vs d_cc
 regtd=sm.OLS(endog=data['TVIP_age_3'], exog=data[['constant', 'd_cc_34']], missing='drop').fit()
 
 betastd = regtd.params
-betastd = [-0.15]
+
 sigma2td= np.var(regtd.resid)
 
 #d_cc vs commute
@@ -65,16 +64,18 @@ sigma2n = np.var(regn.resid)
 
 #------------ PARAMETERS ------------#
 #betas  = [beta1 , beta0]
-betas      = [0.0992312, 0.0084627] 
+betasw = [-0.39,0.16]
+betastd = [-0.18]
+sigma2w_reg = 0.34
 sigma2w_estr = 0.5869
-meanshocks = [-0.1,0.5]
-rho        = 0.9
+meanshocks = [0.3,0.2]
+rho        = 0.4
 sigma1     = 1#constante
-sigma2     = 0.5
+sigma2     = 0.07
 covshocks  = [sigma1,sigma2,rho]
 T          = (24-8)*20  #monthly waking hours
 Lc         = 8*20       #monthly cc hours
-alpha      = -0.5
+alpha      = -0.6
 gamma      = 0.4
 w_matrix   = np.identity(10)
 times = 100
@@ -83,7 +84,7 @@ times_boot = 20
 
 
 #------------ CALL CLASSES, ESTIMATION SIM & BOOTSTRAP ------------#
-param0 = parameters.Parameters(betas, betasw, betastd, betasn, sigma2n, sigma2w_estr, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times)
+param0 = parameters.Parameters(betasw, betastd, betasn, sigma2n, sigma2w_estr, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times)
 model     = util.Utility(param0, N, data)
 model_sim = simdata.SimData(N, model)
 model_boot= bstr.bootstrap(N, data)

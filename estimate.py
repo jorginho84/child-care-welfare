@@ -148,8 +148,8 @@ class estimate:
         self.param.meanshocks[1]   = beta[3] #mean of theta (causal effect of cc on child skills )
         self.param.covshocks[1]    = beta[4] #var of causal effect
         self.param.covshocks[2]    = beta[5] #correlation
-        self.param.betas[0]        = beta[6] #structural parameter of wage equation
-        self.param.betas[1]        = beta[7] #structural parameter of wage equation
+        self.param.betasw[0]        = beta[6] #structural parameter of wage equation
+        self.param.betasw[1]        = beta[7] #structural parameter of wage equation
         self.param.sigma2w_estr    = beta[8] #variance of res of wage equation
         self.param.betastd[0]      = beta[9] #constant from test score equation
         
@@ -211,12 +211,12 @@ class estimate:
                           self.param.meanshocks[1],
                           self.param.covshocks[1],#variance of causal effect
                           self.param.covshocks[2],#correlation
-                          self.param.betas[0],
-                          self.param.betas[1],
+                          self.param.betasw[0],
+                          self.param.betasw[1],
                           self.param.sigma2w_estr,
                           self.param.betastd[0] ])
         
-        opt = minimize(self.ll, beta0,  method='Nelder-Mead', options={'maxiter':5000, 'maxfev': 90000, 'ftol': 1e-3, 'disp': True})
+        opt = minimize(self.ll, beta0,  method='Nelder-Mead', options={'maxiter':5000, 'maxfev': 90000, 'ftol': 1e-1, 'disp': True})
         
         return opt
         

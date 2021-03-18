@@ -143,7 +143,7 @@ class Utility(object):
         alpha  = self.param.alpha
         gamma  = self.param.gamma
         
-        nu =  -shocks[0] + gamma*shocks[1]
+        nu =  shocks[0] + gamma*shocks[1]
         
         income[income <= 0] = 1
         

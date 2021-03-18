@@ -31,32 +31,6 @@ data = pd.read_stata('data/data_python.dta')
 N = len(data)
 data['constant'] = np.ones((N,1))
 
-#------------ REG WITH DATA ------------#
-#wage
-regw=sm.OLS(endog=data['ln_w'], exog=data[['constant', 'm_sch']], missing='drop').fit()
-
-betasw = regw.params
-betasw = [-0.39,0.15]
-sigma2w_reg = 0.34
-
-#test score vs d_cc
-regtd=sm.OLS(endog=data['TVIP_age_3'], exog=data[['constant', 'd_cc_34']], missing='drop').fit()
-
-betastd = regtd.params
-betastd = [-0.05]
-sigma2td= np.var(regtd.resid)
-
-#d_cc vs commute
-regdz=sm.OLS(endog=data['d_cc_34'], exog=data[['constant', 'commute2cc']], missing='drop').fit()
-
-betasdz = regdz.params
-
-#test score vs commute            
-regtz = sm.OLS(endog=data['TVIP_age_3'], exog=data[['constant', 'commute2cc']], missing='drop').fit()
-
-betastz = regtz.params
-            
-
 #non-labor income
 regn = sm.OLS(endog = data['ln_nli'], exog = data[['constant', 'married34', 'd_work', 'tot_kids', 'm_sch']], missing='drop').fit()
 
@@ -65,29 +39,26 @@ sigma2n = np.var(regn.resid)
 
 
 #------------ PARAMETERS ------------#
-#betas  = [beta1 , beta0]
-betas      = [0.0992312, 0.0084627] 
+betasw = [-0.39,0.16]
+betastd = [-0.18]
+sigma2w_reg = 0.34
 sigma2w_estr = 0.5869
-meanshocks = [-0.1,0.5]
-rho        = 0.9
+meanshocks = [0.3,0.2]
+rho        = 0.4
 sigma1     = 1#constante
-sigma2     = 0.5
+sigma2     = 0.07
 covshocks  = [sigma1,sigma2,rho]
 T          = (24-8)*20  #monthly waking hours
 Lc         = 8*20       #monthly cc hours
-alpha      = -0.5
+alpha      = -0.6
 gamma      = 0.4
 
 times = 50
 times_boot = 1000
 
 
-
-
-
-
 #------------ CALL CLASSES, ESTIMATION SIM & BOOTSTRAP ------------#
-param0 = parameters.Parameters(betas, betasw, betastd, betasn, sigma2n, sigma2w_estr, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times)
+param0 = parameters.Parameters(betasw, betastd, betasn, sigma2n, sigma2w_estr, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times)
 model     = util.Utility(param0, N, data)
 model_sim = simdata.SimData(N, model)
 model_boot= bstr.bootstrap(N, data)
@@ -108,7 +79,7 @@ list_ses = [moments_boot['SE Labor Choice'],
             moments_boot['SE Var Score']]
 
 for j in range(10):
-    w_matrix[j,j] = (list_ses[j]**2)**(-1)
+    w_matrix[j,j] = (list_ses[j]**(-2))
 
 
 model_est = est.estimate(N, data, param0, moments_boot, w_matrix)

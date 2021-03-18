@@ -92,9 +92,9 @@ class bootstrap:
         b1_td_boot = np.mean(b1_td_est)
         b1_tz_boot = np.mean(b1_tz_est)
         b1_dz_boot = np.mean(b1_dz_est)
-        se_b1_td_boot = np.mean(se_b1_td_est)
-        se_b1_tz_boot  = np.mean(se_b1_tz_est)
-        se_b1_dz_boot = np.mean(se_b1_dz_est)
+        se_b1_td_boot = np.std(b1_td_est)
+        se_b1_tz_boot  = np.std(b1_tz_est)
+        se_b1_dz_boot = np.std(b1_dz_est)
         
 
 
