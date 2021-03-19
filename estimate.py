@@ -150,8 +150,8 @@ class estimate:
         self.param.covshocks[2]    = beta[5] #correlation
         self.param.betasw[0]        = beta[6] #structural parameter of wage equation
         self.param.betasw[1]        = beta[7] #structural parameter of wage equation
-        self.param.sigma2w_estr    = beta[8] #variance of res of wage equation
-        self.param.betastd[0]      = beta[9] #constant from test score equation
+        self.param.sigma2w_reg    = beta[8] #variance of res of wage equation
+        self.param.betastd      = beta[9] #constant from test score equation
         
     
 
@@ -213,8 +213,8 @@ class estimate:
                           self.param.covshocks[2],#correlation
                           self.param.betasw[0],
                           self.param.betasw[1],
-                          self.param.sigma2w_estr,
-                          self.param.betastd[0] ])
+                          self.param.sigma2w_reg,
+                          self.param.betastd ])
         
         opt = minimize(self.ll, beta0,  method='Nelder-Mead', options={'maxiter':5000, 'maxfev': 90000, 'ftol': 1e-1, 'disp': True})
         

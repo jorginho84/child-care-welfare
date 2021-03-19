@@ -82,7 +82,7 @@ class Utility(object):
         u = np.reshape(np.random.randn(self.N), (self.N,1))
         ones = np.reshape(np.ones(self.N), (self.N,1))
 
-        return  self.param.betastd[0]*ones + np.multiply(shocks[1], cc_choice) + u
+        return  self.param.betastd*ones + np.multiply(shocks[1], cc_choice) + u
      
     
     

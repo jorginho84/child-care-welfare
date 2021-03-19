@@ -63,28 +63,31 @@ sigma2n = np.var(regn.resid)
 
 
 #------------ PARAMETERS ------------#
-#betas  = [beta1 , beta0]
-betasw = [-0.39,0.16]
-betastd = [-0.18]
-sigma2w_reg = 0.34
-sigma2w_estr = 0.5869
-meanshocks = [0.3,0.2]
-rho        = 0.4
-sigma1     = 1#constante
-sigma2     = 0.07
+betas_opt = np.load("/Users/jorge-home/Dropbox/Research/DN-early/Dynamic_childcare/Results/betas_modelv1.npy")
+
+#the list of estimated parameters
+alpha = betas_opt[0]
+gamma = betas_opt[1]
+meanshocks = [betas_opt[2],betas_opt[3]]
+sigma1     = 1#fixed
+sigma2     = betas_opt[4]
+rho        = betas_opt[5]
 covshocks  = [sigma1,sigma2,rho]
+betasw = [betas_opt[6],betas_opt[7]]
+sigma2w_reg = 0.34
+betastd = betas_opt[9]
+
+
 T          = (24-8)*20  #monthly waking hours
 Lc         = 8*20       #monthly cc hours
-alpha      = -0.6
-gamma      = 0.4
 w_matrix   = np.identity(10)
-times = 100
-times_boot = 20
+times = 50
+times_boot = 1000 
 
 
 
 #------------ CALL CLASSES, ESTIMATION SIM & BOOTSTRAP ------------#
-param0 = parameters.Parameters(betasw, betastd, betasn, sigma2n, sigma2w_estr, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times)
+param0 = parameters.Parameters(betasw, betastd, betasn, sigma2n, sigma2w_reg, meanshocks, covshocks, T, Lc, alpha, gamma, times)
 model     = util.Utility(param0, N, data)
 model_sim = simdata.SimData(N, model)
 model_boot= bstr.bootstrap(N, data)
