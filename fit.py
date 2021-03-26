@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import xlsxwriter
 
-sys.path.append("/Users/jorge-home/Dropbox/Research/DN-early/structural")
-#sys.path.append("/Users/antoniaaguilera/Desktop/AY-INV/python/sim-anto/currently working")
+#sys.path.append("/Users/jorge-home/Dropbox/Research/DN-early/structural")
+sys.path.append("/Users/antoniaaguilera/Desktop/RA/python/sim-anto/currently working")
 
 
 #call py scripts
@@ -63,10 +63,13 @@ sigma2n = np.var(regn.resid)
 
 
 #------------ PARAMETERS ------------#
-betas_opt = np.load("/Users/jorge-home/Dropbox/Research/DN-early/Dynamic_childcare/Results/betas_modelv1.npy")
+#betas_opt = np.load("/Users/jorge-home/Dropbox/Research/DN-early/Dynamic_childcare/Results/betas_modelv1.npy")
+betas_opt = np.load("/Users/antoniaaguilera/Desktop/RA/python/sim-anto/currently working/betas_modelv2.npy")
+
 
 #the list of estimated parameters
-alpha = betas_opt[0]
+#alpha = betas_opt[0]
+alpha = 0.003
 gamma = betas_opt[1]
 meanshocks = [betas_opt[2],betas_opt[3]]
 sigma1     = 1#fixed
@@ -99,7 +102,7 @@ model_est = est.estimate(N, data, param0, moments_boot, w_matrix)
 results_estimate = model_est.simulation(model_sim)
 
 
-#------------ DATA SIMULATION ------------#
+#------------ EXCEL TABLE ------------#
 
 workbook = xlsxwriter.Workbook('data/labor_choice.xlsx')
 worksheet = workbook.add_worksheet()
@@ -147,22 +150,43 @@ worksheet.write('E2', 'SE')
 worksheet.write('E3', moments_boot['SE Labor Choice'])
 worksheet.write('E4', moments_boot['SE CC Choice'])
 worksheet.write('E5', moments_boot['SE Test Score'])
-worksheet.write('E6', moments_boot['SE Beta0'])
-worksheet.write('E7', moments_boot['SE Beta1'])
-worksheet.write('E8', moments_boot['SE sigma^2_e'])
+worksheet.write('E6', moments_boot['SE beta0_w'])
+worksheet.write('E7', moments_boot['SE beta1_w'])
+worksheet.write('E8', moments_boot['SE resid_var_w'])
 worksheet.write('E9', moments_boot['SE beta1_td'])
 worksheet.write('E10', moments_boot['SE beta1_tz'])
 worksheet.write('E11', moments_boot['SE beta1_dz'])
-worksheet.write('E12', moments_boot['SE Var Score'])
+worksheet.write('E12', moments_boot['SE resid_var_td'])
 
 
 workbook.close()
 
+# ------------ WRITE .TEX FILE ------------ # 
 
-
-
-
-
+#with open("/Users/jorge-home/Dropbox/Research/DN-early/structural/tabla1.tex", "w")
+with open("/Users/antoniaaguilera/Desktop/RA/python/sim-anto/currently working/tabla1.tex", "w") as f:   # Opens file and casts as f 
+    f.write("\\begin{tabular}{lcccccc}   \n")
+    f.write("\\toprule\\textbf{Moments} & & \\textbf{Simulated} & & \\textbf{Data} & & \\textbf{S.E. data} \\\\\hline \n")
+    f.write("A. Labor supply, child care choice and test score &&         & &       & &  \\\\ \n")
+    f.write("Pr(full-time work)  & &" + str(round(results_estimate['Labor Choice'], 3)) + "& &" + str(round(moments_boot['Labor Choice'],3)) + "& &" + str(round(moments_boot['SE Labor Choice'],3)) + " \\\\ \n")
+    f.write("Pr(cc choice)       & &" + str(round(results_estimate['CC Choice'],3))     + "& &" + str(round(moments_boot['CC Choice'],3))    + "& &" + str(round(moments_boot['SE CC Choice'],3))    + " \\\\ \n")
+    f.write("Test Score          & &" + str(round(results_estimate['Test Score'],3))    + "& &" + str(round(moments_boot['Test Score'],3))   + "& &" + str(round(moments_boot['SE Test Score'],3))   + " \\\\ \n")
+    f.write(" & & & & & & \\\\ \n ")
+    f.write("B. Mother: log(wage_i)=X'_i\\beta +\\varepsilon_i & & & & && \\\\ \n")
+    f.write("Constant            & &" + str(round(results_estimate['beta0_w'],3))     + "& &" + str(round(moments_boot['beta0_w'],3))     + "& &" + str(round(moments_boot['SE beta0_w'],3))     + " \\\\ \n")
+    f.write("Return to schooling & &" + str(round(results_estimate['beta1_w'],3))     + "& &" + str(round(moments_boot['beta1_w'],3))     + "& &" + str(round(moments_boot['SE beta1_w'],3))     + " \\\\ \n")
+    f.write("\\sigma^2           & &" + str(round(results_estimate['resid_var_w'],3)) + "& &" + str(round(moments_boot['resid_var_w'],3)) + "& &" + str(round(moments_boot['SE resid_var_w'],3)) + " \\\\ \n")
+    f.write(" & & & & & & \\\\ \n ")
+    f.write("C. Child: score_i = X'_i\\beta + \\varepsilon_i   & &  & &  & &  \\\\ \n")
+    f.write("Coefficient on child care dummy & &" + str(round(results_estimate['beta1_td'],3))+ "& &" + str(round(moments_boot['beta1_td'],3))     + "& &" + str(round(moments_boot['SE beta1_td'],3))     + " \\\\ \n")
+    f.write("\\sigma^2                  & &" + str(round(results_estimate['resid_var_td'],3)) + "& &" + str(round(moments_boot['resid_var_td'],3)) + "& &" + str(round(moments_boot['SE resid_var_td'],3)) + " \\\\ \n")
+    f.write(" & & & & & & \\\\ \n ")
+    f.write("D. Child: score_i = Z'_i\\delta + u_i   & &  & &  & &  \\\\ \n")
+    f.write("Coefficient on commute time to child care center  & &" + str(round(results_estimate['beta1_tz'],3))+ "& &" + str(round(moments_boot['beta1_tz'],3)) + "& &" + str(round(moments_boot['SE beta1_tz'],3)) + " \\\\ \n")
+    f.write(" & & & & & & \\\\ \n ")
+    f.write("E. Child: d\\_cc_i = X'_i\\beta + \\varepsilon_i   & &  & &  & &  \\\\ \n")
+    f.write("Coefficient on commute time to child care center & &" + str(round(results_estimate['beta1_dz'],3))+ "& &" + str(round(moments_boot['beta1_dz'],3)) + "& &" + str(round(moments_boot['SE beta1_dz'],3)) + " \\\\ \n") 
+    f.write("\end{tabular}")
 
 
 

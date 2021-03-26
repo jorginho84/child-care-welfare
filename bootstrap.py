@@ -99,12 +99,12 @@ class bootstrap:
 
 
         return {'Labor Choice': labor_boot     , 'SE Labor Choice': se_labor  , 
-                'CC Choice': cc_boot           , 'SE CC Choice': se_cc        ,
+                'CC Choice': cc_boot           , 'SE CC Choice': se_cc        , 
                 'Test Score': score_boot       , 'SE Test Score': se_score    ,
-                'beta0_w': b0_boot             , 'SE Beta0': se0_boot         ,
-                'beta1_w': b1_boot             , 'SE Beta1': se1_boot         ,
-                'resid_var_w': varres          , 'SE sigma^2_e': varres_se    ,
-                'resid_var_td': var_score_boot , 'SE Var Score': var_score_se ,
+                'beta0_w': b0_boot             , 'SE beta0_w': se0_boot         ,
+                'beta1_w': b1_boot             , 'SE beta1_w': se1_boot         ,
+                'resid_var_w': varres          , 'SE resid_var_w': varres_se    ,
+                'resid_var_td': var_score_boot , 'SE resid_var_td': var_score_se ,
                 'beta1_td': b1_td_boot         , 'SE beta1_td': se_b1_td_boot ,
                 'beta1_tz': b1_tz_boot         , 'SE beta1_tz': se_b1_tz_boot   ,
                 'beta1_dz': b1_dz_boot         , 'SE beta1_dz': se_b1_dz_boot }
