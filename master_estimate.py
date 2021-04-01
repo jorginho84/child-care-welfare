@@ -73,13 +73,13 @@ w_matrix = np.zeros((10,10))
 list_ses = [moments_boot['SE Labor Choice'],
             moments_boot['SE CC Choice'],
             moments_boot['SE Test Score'],
-            moments_boot['SE Beta0'],
-            moments_boot['SE Beta1'],
-            moments_boot['SE sigma^2_e'],
+            moments_boot['SE beta0_w'],
+            moments_boot['SE beta1_w'],
+            moments_boot['SE resid_var_w'],
             moments_boot['SE beta1_td'],
             moments_boot['SE beta1_tz'],
             moments_boot['SE beta1_dz'],
-            moments_boot['SE Var Score']]
+            moments_boot['SE resid_var_td']]
 
 for j in range(10):
     w_matrix[j,j] = (list_ses[j]**(-2))

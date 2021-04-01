@@ -139,6 +139,8 @@ class Utility(object):
         nli = self.nli(d_work)
         income = wage*H + nli
         
+        C = D*np.reshape(np.array(self.data['commute2cc'],dtype=np.float64), (self.N, 1)) #commute*dummy cc
+        L = self.param.T - (1-D)*self.param.Lc - H - 2*C
         
         alpha  = self.param.alpha
         gamma  = self.param.gamma
@@ -147,7 +149,8 @@ class Utility(object):
         
         income[income <= 0] = 1
         
-        return np.log(income) + d_work*alpha + D*nu
+        return np.log(income) + L*alpha + D*nu
+    
 
 
 

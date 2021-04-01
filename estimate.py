@@ -121,9 +121,9 @@ class estimate:
         
         var_score_sim = np.mean(var_score)
         
-        return { 'Labor Choice': labor_sim,
-                'CC Choice': cc_sim,
-                'Test Score': score_sim,
+        return { 'Labor Choice': labor_sim, 'sim_Labor': (sim['Hours Choice']/160),
+                'CC Choice': cc_sim,        'sim_CC': sim['CC Choice'],
+                'Test Score': score_sim,    'sim_Score': sim['Test Score'],
                 'beta0_w': b0_sim,
                 'beta1_w': b1_sim,
                 'resid_var_w': varres_sim,
